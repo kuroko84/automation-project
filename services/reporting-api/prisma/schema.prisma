@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model TestRun {
+  id              String   @id @default(uuid())
+  project         String?
+  module          String?
+  framework       String?
+  environment     String?
+  triggeredBy     String?
+  status          String?
+
+  startTime       DateTime?
+  endTime         DateTime?
+  durationMs      BigInt?
+
+  gitBranch       String?
+  gitCommit       String?
+  gitRepo         String?
+
+  ciJobName       String?
+  ciBuildNumber   Int?
+  ciBuildUrl      String?
+
+  createdAt       DateTime @default(now())
+
+  testCases       TestCase[]
+  performanceMetrics PerformanceMetric[]
+}
+
+model TestCase {
+  id            String   @id @default(uuid())
+  testRunId     String
+  suite         String?
+  name          String
+  status        String
+  retry         Int?
+  startTime     DateTime?
+  endTime       DateTime?
+  durationMs    BigInt?
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  testRun       TestRun @relation(fields: [testRunId], references: [id])
+  tags          TestCaseTag[]
+  artifacts     TestArtifact[]
+}
+
+model TestCaseTag {
+  id          Int      @id @default(autoincrement())
+  testCaseId  String
+  tag         String
+
+  testCase    TestCase @relation(fields: [testCaseId], references: [id])
+}
+
+model TestArtifact {
+  id          String   @id @default(uuid())
+  testCaseId  String
+  type        String
+  path        String
+  createdAt  DateTime
+
+  testCase    TestCase @relation(fields: [testCaseId], references: [id])
+}
+
+model PerformanceMetric {
+  id         String   @id @default(uuid())
+  testRunId  String
+  name       String
+  value      Float
+
+  testRun    TestRun @relation(fields: [testRunId], references: [id])
+}

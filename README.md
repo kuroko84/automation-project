@@ -1,0 +1,1 @@
+Automation Testing Ecosystem for Multi-Platform (API – Web – Mobile) with CI/CD, Reporting & Dashboard
